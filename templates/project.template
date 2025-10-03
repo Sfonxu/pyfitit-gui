@@ -1,0 +1,49 @@
+from pyfitit import *
+def moleculeConstructor(project, params):
+    m = Molecule(join('$project_folder', '$molecule_file'))
+
+    m.setParts('$parts')
+
+$deformations
+
+    if not m.checkInteratomicDistance(minDist = 0.8):
+        print('Warning: there are atoms with distance < minDist')
+    return m
+
+def projectConstructor(expFile='$spectrum_file'):
+    project = Project()
+    project.name = '$project_name'
+
+    file_path = join('$project_folder', '$spectrum_file')
+
+    project.spectrum = readSpectrum(file_path, energyColumn = 0, intensityColumn = 1, skiprows = 1)
+
+    a = $left_interval; b = $right_interval
+    project.intervals = {
+      'fit_norm': [a, b],
+      'fit_smooth': [a, b],
+      'fit_geometry': [a, b],
+      'plot': [a, b]
+    }
+
+    project.geometryParamRanges = {}
+    project.FDMNES_calc = {
+        'Energy range': $energy_range ,
+        'Green': $Green,
+        'radius': $Radius,
+    }
+    project.FDMNES_smooth = {
+        'Gamma_hole': $GH,
+        'Ecent': $Ecent,
+        'Elarg': $Elarg,
+        'Gamma_max': $Gmax,
+        'Efermi': $Efermi,
+        'shift': $shift,
+        'norm': $norm
+    }
+
+    project.moleculeConstructor = MethodType(moleculeConstructor, project)
+    return project
+
+project = projectConstructor()
+project.constructMoleculesForEdgePoints()
