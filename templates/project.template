@@ -28,7 +28,7 @@ def projectConstructor(expFile='$spectrum_file'):
 
     project.geometryParamRanges = {}
     project.FDMNES_calc = {
-        'Energy range': $energy_range ,
+        'Energy range': '$energy_range',
         'Green': $Green,
         'radius': $Radius,
     }
