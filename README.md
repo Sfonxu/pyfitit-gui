@@ -16,4 +16,7 @@ or by downlading the `.zip` file. Then, in the source code folder after creating
 pip install . 
 ```
 
+## Usage
+After installing, launch the app by typing `pyfitit-gui` in your terminal.
+
 
