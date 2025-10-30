@@ -4,146 +4,10 @@ import os
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from datatypes import Project, Deformation
+from .datatypes import Deformation
+from .deformation_dialog import DeformationDialog
 from pathlib import Path
 from string import Template
-
-
-class DeformationDialog(QDialog):
-    def __init__(self, deformations, deformation_listbox, deformation_to_edit_idx=None):
-        super().__init__()
-        self.setWindowTitle("Deformation manager")
-
-        main = QVBoxLayout()
-        main.addWidget(QLabel("Input structure part index"))
-        self.deformation_parts = QLineEdit()
-        self.deformation_parts.setValidator(QIntValidator())
-        main.addWidget(self.deformation_parts)
-        main.addWidget(QLabel("Input first atom index"))
-        self.deformation_first_atom = QLineEdit()
-        self.deformation_first_atom.setValidator(QIntValidator())
-        main.addWidget(self.deformation_first_atom)
-        main.addWidget(QLabel("Input second atom index"))
-        self.deformation_second_atom = QLineEdit()
-        self.deformation_second_atom.setValidator(QIntValidator())
-        main.addWidget(self.deformation_second_atom)
-        main.addWidget(QLabel("Choose deformation type"))
-        self.deformation_type = QComboBox()
-        self.deformation_type.addItems(["rotation", "shift"])
-        self.deformation_type.isEditable = False
-        main.addWidget(self.deformation_type)
-        main.addWidget(QLabel("Input a unique deformation name"))
-        self.deformation_name = QLineEdit()
-        main.addWidget(self.deformation_name)
-
-        if deformation_to_edit_idx is not None:
-            temp_deformation = deformations[deformation_to_edit_idx]
-            self.deformation_parts.setText(temp_deformation.part)
-            self.deformation_first_atom.setText(temp_deformation.atom_1)
-            self.deformation_second_atom.setText(temp_deformation.atom_2)
-            self.deformation_name.setText(temp_deformation.name)
-            combobox_idx = self.deformation_type.setCurrentText(
-                temp_deformation.def_type
-            )
-
-        QBtn = QDialogButtonBox.Save | QDialogButtonBox.Cancel
-
-        ButtonBox = QDialogButtonBox(QBtn)
-        ButtonBox.accepted.connect(
-            lambda: self.validate(
-                deformations, deformation_listbox, deformation_to_edit_idx
-            )
-        )
-
-        ButtonBox.rejected.connect(self.reject)
-
-        main.addWidget(ButtonBox)
-        main.addStretch()
-
-        self.setLayout(main)
-
-    def validate(
-        self, deformations, deformation_listbox, deformation_to_edit_idx=None
-    ) -> bool:
-        invalidate = False
-        deformation_holder = [
-            self.deformation_parts.text(),
-            self.deformation_first_atom.text(),
-            self.deformation_second_atom.text(),
-            self.deformation_type.currentText(),
-            self.deformation_name.text(),
-        ]
-
-        for item in deformation_holder:
-            if not item:
-                invalidate = True
-                self.deformation_warning_message(
-                    "Warning: All fields must have a value!"
-                )
-                break
-
-        if not invalidate:
-            if (
-                not deformation_holder[1].isdigit()
-                or not deformation_holder[2].isdigit()
-            ):
-                invalidate = True
-                self.deformation_warning_message(
-                    "Warning: Axis atom indices must be intigers!"
-                )
-
-        if not invalidate:
-            for item in deformations:
-                if item.name == self.deformation_name.text():
-                    invalidate = True
-                    self.deformation_warning_message(
-                        "Warning: Deformation names must be unique!"
-                    )
-
-        if not invalidate:
-            if deformation_to_edit_idx is not None:
-                self.edit_deformation(
-                    deformations, deformation_listbox, deformation_to_edit_idx
-                )
-            else:
-                self.append_deformation(deformations, deformation_listbox)
-            self.close()
-
-    def edit_deformation(
-        self, deformations, deformation_listbox, deformation_to_edit_idx
-    ):
-        deformations[deformation_to_edit_idx] = Deformation(
-            self.deformation_parts.text(),
-            self.deformation_first_atom.text(),
-            self.deformation_second_atom.text(),
-            self.deformation_type.currentText(),
-            self.deformation_name.text(),
-        )
-
-        deformation_listbox.item(deformation_to_edit_idx).setText(
-            self.deformation_name.text()
-        )
-
-    def append_deformation(self, deformations, deformation_listbox):
-
-        deformations.append(
-            Deformation(
-                self.deformation_parts.text(),
-                self.deformation_first_atom.text(),
-                self.deformation_second_atom.text(),
-                self.deformation_type.currentText(),
-                self.deformation_name.text(),
-            )
-        )
-        deformation_listbox.addItem(self.deformation_name.text())
-
-    def deformation_warning_message(self, warning):
-        error_dialog = QMessageBox(self)
-        error_dialog.setIcon(QMessageBox.Icon.Warning)
-        error_dialog.setText(warning)
-        error_dialog.setWindowTitle("Deformation input warning!")
-        error_dialog.exec_()
-
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
@@ -187,8 +51,9 @@ class MainWindow(QWidget):
 
         project_directory_input = QPushButton()
         project_directory_input.setIcon(icon_dir)
-        project_directory_input.setText("Open direcotry")
+        project_directory_input.setText("Open directory")
         project_directory_input.clicked.connect(self.get_project_directory)
+        project_directory_input.setToolTip("<font>This directory is where all the generated files will appear.</font>")
 
         project_input_layout.addWidget(
             QLabel("Choose project directory"), 0, 0, align_left
@@ -204,6 +69,7 @@ class MainWindow(QWidget):
         self.molecule_input.setIcon(icon_file)
         self.molecule_input.setText("Open file")
         self.molecule_input.clicked.connect(self.get_molecule_file)
+        self.molecule_input.setToolTip("<font>This file should describe the <b>molecule to simulate</b> and will be used to generate deformated molecules for further calculations.</font>")
 
         project_input_layout.addWidget(
             QLabel("Input .xyz molecule file"), 3, 0, align_left
@@ -217,6 +83,7 @@ class MainWindow(QWidget):
         self.spectrum_input.setIcon(icon_file)
         self.spectrum_input.setText("Open file")
         self.spectrum_input.clicked.connect(self.get_spectrum_file)
+        self.spectrum_input.setToolTip("This file should contain the <b>experimental spectrum</b> of the molecule of interest and be saved in a column format, where the first column is the energy column and the second column is the intensity column.")
 
         project_input_layout.addWidget(
             QLabel("Input the experimental spectrum file"), 6, 0, align_left
@@ -227,6 +94,7 @@ class MainWindow(QWidget):
         project_input_layout.addWidget(self.spectrum_file_label, 7, 0, 2, 1, align_left)
 
         self.project_name_input = QLineEdit()
+        self.project_name_input.setToolTip("A field to input a name for your project.")
         project_input_layout.addWidget(QLabel("Input project name"), 9, 0, align_left)
         project_input_layout.addWidget(self.project_name_input, 9, 1)
 
@@ -243,8 +111,10 @@ class MainWindow(QWidget):
 
         self.project_energy_interval_left = QLineEdit()
         self.project_energy_interval_left.setValidator(QDoubleValidator())
+        self.project_energy_interval_left.setToolTip("<font>Starting and ending values for the energy interval used for calculations and FDMNES smoothing.</font>")
         self.project_energy_interval_right = QLineEdit()
         self.project_energy_interval_right.setValidator(QDoubleValidator())
+        self.project_energy_interval_right.setToolTip("<font>Starting and ending values for the energy interval used for calculations and FDMNES smoothing.</font>")
         fit_input_layout.addWidget(
             QLabel("Input project energy intervals"), 0, 0, align_left
         )
@@ -254,10 +124,11 @@ class MainWindow(QWidget):
         )
 
         self.FDMNES_energy_range = QLineEdit()
+        self.FDMNES_energy_range.setToolTip("<font>The FDMNES energy range used in calculations. Should be structured like \'e0 step0 e1 step1 ...\'. For more info refer to FDMNES manual page 22.</font>")
         fit_input_layout.addWidget(
-            QLabel("Input FDMNES energy ranges"), 2, 0, align_left
+            QLabel("Input FDMNES energy range"), 2, 0, align_left
         )
-        fit_input_layout.addWidget(self.FDMNES_energy_range, 2, 2)
+        fit_input_layout.addWidget(self.FDMNES_energy_range, 2, 1, 1, 2)
 
         self.FDMNES_green = QCheckBox()
         self.FDMNES_green.setStyleSheet(
@@ -268,7 +139,7 @@ class MainWindow(QWidget):
             "subcontrol-position: right;"
             "}"
         )
-
+        self.FDMNES_green.setToolTip("<font>This approximation will make calculations significantly faster but also far less accurate.</font>")
         fit_input_layout.addWidget(
             QLabel("Use Green (Muffin-tin) approximation?"), 4, 0, align_left
         )
@@ -276,7 +147,7 @@ class MainWindow(QWidget):
 
         self.FDMNES_radius = QLineEdit()
         self.FDMNES_radius.setValidator(QDoubleValidator())
-        self.FDMNES_radius.setFixedWidth(50)
+        self.FDMNES_radius.setToolTip("<font>Final radius of the cluster where atoms are considered for calculations. The sphere is centered at the abosrbing atom. For more information refer to FDMNES manual page 17.</font>")
         fit_input_layout.addWidget(
             QLabel("Input FDMNES calculation radius"), 6, 0, align_left
         )
@@ -468,16 +339,12 @@ class MainWindow(QWidget):
                         or v == "No spectrum file chosen!"
                         or v == "No molecule file chosen!"
                     ):
-                        print(f"MISSING VALUE {v} FOR KEY {k}")
                         invalidate = True
-                        error_dialog = QMessageBox(self)
-                        error_dialog.setIcon(QMessageBox.Icon.Critical)
-                        error_dialog.setWindowTitle("Generation error!")
-                        error_dialog.setText(
-                            "Cannot generate project as there are still empty fields!"
-                        )
-                        error_dialog.exec_()
+                        self.save_and_exit_error_message("Cannot generate project as there are empty fields!")
                         break
+
+                if float(output_dictionary["left_interval"]) > float(output_dictionary["right_interval"]):
+                    self.save_and_exit_error_message("Start of energy interval is larger than the end!")
 
                 if not invalidate:
                     project_template_path = (
@@ -528,6 +395,13 @@ class MainWindow(QWidget):
         )
         self.project_directory_label.setText(dirname)
 
+    def save_and_exit_error_message(self, warning):
+        error_dialog = QMessageBox(self)
+        error_dialog.setIcon(QMessageBox.Icon.Critical)
+        error_dialog.setText(warning)
+        error_dialog.setWindowTitle("Generation error!")
+        error_dialog.exec_()
+
     def expand_deformations(self):
         deform_string_list = []
         for deformation in self.deformations:
@@ -552,16 +426,5 @@ class MainWindow(QWidget):
             deformation_string = "".join(deform_string_list)
             return deformation_string
         else:
-            error_dialog = QMessageBox(self)
-            error_dialog.setIcon(QMessageBox.Icon.Critical)
-            error_dialog.setWindowTitle("Generation error!")
-            error_dialog.setText("Cannot generate project: no deformations defined!")
-            error_dialog.exec_()
+            self.save_and_exit_error_message("No deformations defined, unable to generate project!")
             return ""
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    MW = MainWindow()
-    MW.show()
-    sys.exit(app.exec())
