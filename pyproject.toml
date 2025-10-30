@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["pyfitit_gui"]
+
+[project]
+name = "pyfitit_gui"
+dependencies = [
+    "pyfitit",
+    "PyQT5",
+]
+readme = "README.md"
+authors = [
+    {name = "Michał Wroński", email = "mwronski@student.agh.edu.pl"}
+]
+dynamic = ["version"]
+
+[project.scripts]
+pyfitit-gui = "pyfitit_gui.main:main"
