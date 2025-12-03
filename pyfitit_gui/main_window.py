@@ -215,8 +215,7 @@ class MainWindow(QWidget):
         molecule_deformations_frame.setFrameShape(QFrame.Panel)
 
         self.molecule_partition = QLineEdit()
-        molecule_partition_regex = QRegExp(r"(?:\d+-\d+,)+")
-        #WRONG - doesnt allow single atoms
+        molecule_partition_regex = QRegExp(r"(?:(\d+.+\,+)|(\d\,))")
         molecule_partition_validator = QRegExpValidator(molecule_partition_regex)
         self.molecule_partition.setValidator(molecule_partition_validator)
 
