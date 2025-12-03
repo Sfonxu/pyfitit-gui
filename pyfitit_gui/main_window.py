@@ -175,7 +175,7 @@ class MainWindow(QWidget):
 
         self.smooth_Efermi = QLineEdit()
         self.smooth_Efermi.setValidator(QDoubleValidator())
-        fit_input_layout.addWidget(QLabel("Gmax"), 16, 0)
+        fit_input_layout.addWidget(QLabel("EFermi"), 16, 0)
         fit_input_layout.addWidget(self.smooth_Efermi, 16, 2)
 
         self.smooth_Shift = QLineEdit()
@@ -216,6 +216,7 @@ class MainWindow(QWidget):
 
         self.molecule_partition = QLineEdit()
         molecule_partition_regex = QRegExp(r"(?:\d+-\d+,)+")
+        #WRONG - doesnt allow single atoms
         molecule_partition_validator = QRegExpValidator(molecule_partition_regex)
         self.molecule_partition.setValidator(molecule_partition_validator)
 
@@ -261,12 +262,18 @@ class MainWindow(QWidget):
         save_project_box.setFrameShape(QFrame.Panel)
         save_project_layout = QHBoxLayout()
 
-        Btns = QDialogButtonBox.Cancel | QDialogButtonBox.Save
+        Btns = QDialogButtonBox.Cancel | QDialogButtonBox.Save | QDialogButtonBox.Close
         BtnsBox = QDialogButtonBox(Btns)
 
         save_project_layout.addWidget(BtnsBox)
-        BtnsBox.accepted.connect(self.save_and_exit_dialog)
-        BtnsBox.rejected.connect(self.quit_without_saving_dialog)
+        cancel_button = BtnsBox.button(QDialogButtonBox.Cancel)
+        cancel_button.clicked.connect(self.quit_without_saving_dialog)
+
+        save_button = BtnsBox.button(QDialogButtonBox.Save)
+        save_button.clicked.connect(lambda: self.save_project_dialog(False))
+        
+        close_button = BtnsBox.button(QDialogButtonBox.Close)
+        close_button.clicked.connect(lambda: self.save_project_dialog(True))
 
         save_project_box.setLayout(save_project_layout)
         right_column_main.addWidget(save_project_box)
@@ -301,10 +308,13 @@ class MainWindow(QWidget):
             self.deformations.pop(idx.row())
             self.deformation_list.takeItem(idx.row())
 
-    def save_and_exit_dialog(self):
+    def save_project_dialog(self, close: bool):
         mb = QMessageBox()
-        mb.setWindowTitle("Save and Exit")
-        mb.setText("Are you sure you want to save the current project and exit?")
+        mb.setWindowTitle("Save project")
+        if not close:
+            mb.setText("Are you sure you want to save the current project?")
+        else:
+            mb.setText("Are you sure you want to save the current project and exit?")
         mb.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         retval = mb.exec()
         if retval == QMessageBox.Yes:
@@ -357,6 +367,9 @@ class MainWindow(QWidget):
                             f"{self.project_directory_label.text()}/project.py", "x"
                         ) as output:
                             output.write(result)
+                            if close:
+                                self.close()
+    
 
     def quit_without_saving_dialog(self):
         quit_dialog = QMessageBox(self)
