@@ -272,6 +272,7 @@ class MainWindow(QWidget):
         save_button.clicked.connect(lambda: self.save_project_dialog(False))
         
         close_button = BtnsBox.button(QDialogButtonBox.Close)
+        close_button.setText("Save and Close")
         close_button.clicked.connect(lambda: self.save_project_dialog(True))
 
         save_project_box.setLayout(save_project_layout)
@@ -362,10 +363,19 @@ class MainWindow(QWidget):
                     with project_template_path.open() as fp:
                         template = Template(fp.read())
                         result = template.substitute(output_dictionary)
-                        with open(
-                            f"{self.project_directory_label.text()}/project.py", "x"
-                        ) as output:
-                            output.write(result)
+                        try:
+                            with open(
+                                    f"{self.project_directory_label.text()}/{self.project_name_input.text()}.py", "x"
+                            ) as output:
+                                output.write(result)
+                        except:
+                            self.save_and_exit_error_message("Failed to save, file already exists!")
+                        else:
+                            save_success_msgbox = QMessageBox()
+                            save_success_msgbox.setText(f"Saved project successfuly as {self.project_name_input.text()}")
+                            save_success_msgbox.setWindowTitle("Save successful")
+                            save_success_msgbox.setStandardButtons(QMessageBox.Ok)
+                            save_success_msgbox.exec()
                             if close:
                                 self.close()
     
