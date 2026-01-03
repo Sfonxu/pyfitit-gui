@@ -24,11 +24,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Set up Python
+      - name: Set up Python, build, twine
         uses: actions/setup-python@v5.2.0
         with:
           python-version: "3.11"
-      - name: Set up packages
       - run: |
           pip install twine build
           unset CI
