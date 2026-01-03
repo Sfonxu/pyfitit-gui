@@ -3,8 +3,7 @@ requires = ["setuptools >= 77.0.3", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["pyfitit_gui*", "pyfitit_gui/templates/*.template"]
-namespaces = false
+where = ["pyfitit_gui*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.template"]
