@@ -11,7 +11,8 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 12 * * 1'
-
+  release:
+    types: [published]
 
 jobs:
   pdoc:
