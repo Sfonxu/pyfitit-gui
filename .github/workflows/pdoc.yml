@@ -25,7 +25,7 @@ jobs:
           pip install -e .
           PDOC_ALLOW_EXEC=1 python -We -m pdoc -o html pyfitit_gui
       - if: startsWith(github.ref, 'refs/tags')
-        uses: JamesIves/github-pages-deploy-action@4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: pdoc
           folder: html
