@@ -1,21 +1,19 @@
+"""Module contatining a helper function to launch the app from command line"""
+
 import sys
-import re
-import os
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from .datatypes import Deformation
-from pathlib import Path
-from string import Template
+
+from PyQt5.QtWidgets import QApplication
 
 from .main_window import MainWindow
 
+
 def main():
+    """Helper function to launch the GUI app"""
     app = QApplication(sys.argv)
-    MW = MainWindow()
-    MW.show()
+    main_window = MainWindow()
+    main_window.show()
     app.exec()
+
 
 if __name__ == "__main__":
     sys.exit(main())
-

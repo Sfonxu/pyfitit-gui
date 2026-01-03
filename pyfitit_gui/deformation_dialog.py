@@ -1,10 +1,34 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+"""Module holding the logic of adding deformations to the simulation input file"""
+
+from PyQt5.QtGui import QIntValidator
+from PyQt5.QtWidgets import (
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QMessageBox,
+    QVBoxLayout,
+)
+
 from .datatypes import Deformation
 
+
 class DeformationDialog(QDialog):
-    def __init__(self, deformations, deformation_listbox, deformation_to_edit_idx=None):
+    """Main dialog window definition
+    Init:
+    deformations: a list of deformations in the main app
+    deformation_listbox: QListBox object in the main app to display the deformation
+    deformation_to_edit_idx: index of a deformation on the deformations list to edit
+    """
+
+    def __init__(
+        self,
+        deformations: list[Deformation],
+        deformation_listbox: QListWidget,
+        deformation_to_edit_idx: int = None,
+    ):
         super().__init__()
         self.setWindowTitle("Deformation manager")
 
@@ -36,29 +60,36 @@ class DeformationDialog(QDialog):
             self.deformation_first_atom.setText(temp_deformation.atom_1)
             self.deformation_second_atom.setText(temp_deformation.atom_2)
             self.deformation_name.setText(temp_deformation.name)
-            combobox_idx = self.deformation_type.setCurrentText(
-                temp_deformation.def_type
-            )
+            self.deformation_type.setCurrentText(temp_deformation.def_type)
 
-        QBtn = QDialogButtonBox.Save | QDialogButtonBox.Cancel
+        button = QDialogButtonBox.Save | QDialogButtonBox.Cancel
 
-        ButtonBox = QDialogButtonBox(QBtn)
-        ButtonBox.accepted.connect(
+        button_box = QDialogButtonBox(button)
+        button_box.accepted.connect(
             lambda: self.validate(
                 deformations, deformation_listbox, deformation_to_edit_idx
             )
         )
 
-        ButtonBox.rejected.connect(self.reject)
+        button_box.rejected.connect(self.reject)
 
-        main.addWidget(ButtonBox)
+        main.addWidget(button_box)
         main.addStretch()
 
         self.setLayout(main)
 
     def validate(
-        self, deformations, deformation_listbox, deformation_to_edit_idx=None
+        self,
+        deformations: list[Deformation],
+        deformation_listbox: QListWidget,
+        deformation_to_edit_idx: int = None,
     ):
+        """Method that checks if input data conforms to pyfitit way of defining a deformation
+        Arguments:
+        deformations: a list of deformations in the main app
+        deformation_listbox: QListBox object in the main app to display the deformation
+        deformation_to_edit_idx: index of a deformation on the deformations list to edit
+        """
         invalidate = False
         deformation_holder = [
             self.deformation_parts.text(),
@@ -104,8 +135,17 @@ class DeformationDialog(QDialog):
             self.close()
 
     def edit_deformation(
-        self, deformations, deformation_listbox, deformation_to_edit_idx
+        self,
+        deformations: list[Deformation],
+        deformation_listbox: QListWidget,
+        deformation_to_edit_idx: int,
     ):
+        """Method that loads a defined deformation and allows the user to edit it in GUI
+        Arguments:
+        deformations: a list of deformations in the main app
+        deformation_listbox: QListBox object in the main app to display the deformation
+        deformation_to_edit_idx: index of a deformation on the deformations list to edit
+        """
         deformations[deformation_to_edit_idx] = Deformation(
             self.deformation_parts.text(),
             self.deformation_first_atom.text(),
@@ -118,7 +158,14 @@ class DeformationDialog(QDialog):
             self.deformation_name.text()
         )
 
-    def append_deformation(self, deformations, deformation_listbox):
+    def append_deformation(
+        self, deformations: list[Deformation], deformation_listbox: QListWidget
+    ):
+        """Method to add a defined deformation to the list in the main app
+        Arguments:
+        deformations: a list of deformations in the main app
+        deformation_listbox: QListBox object in the main app to display the deformation
+        """
         deformations.append(
             Deformation(
                 self.deformation_parts.text(),
@@ -130,8 +177,13 @@ class DeformationDialog(QDialog):
         )
         deformation_listbox.addItem(self.deformation_name.text())
 
-    def deformation_warning_message(self, warning):
+    def deformation_warning_message(self, warning: str):
+        """Method displaying a new window with a warning message
+        Arguments:
+        Warning: a warning message to display
+        """
         error_dialog = QMessageBox(self)
+        # pylint: disable=no-member
         error_dialog.setIcon(QMessageBox.Icon.Warning)
         error_dialog.setText(warning)
         error_dialog.setWindowTitle("Deformation input warning!")
