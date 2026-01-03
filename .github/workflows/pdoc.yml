@@ -1,0 +1,33 @@
+name: pdoc
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 12 * * 1'
+
+
+jobs:
+  pdoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v5.2.0
+        with:
+          python-version: "3.10"
+      - run: |
+          pip install pdoc
+          pip install -e .
+          PDOC_ALLOW_EXEC=1 python -We -m pdoc -o html pyfitit_gui
+      - if: github.event_name == 'push' && github.ref == 'refs/head/main'
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: pdoc
+          folder: html
+          clean: true

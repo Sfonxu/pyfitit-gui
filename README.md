@@ -7,16 +7,21 @@ This project aims to add a graphical user interface to the [PyFitIt](https://git
 <b>NOTE: Most features are still in an unfinished state.</b>
 
 ## Installation
-In order to install the package, download the source code via either:
+In order to install the package, you can use the pip package manager:
 ```bash
-git clone https://github.com/Sfonxu/pyfitit-gui.git
+pip install pyfitit-gui
 ```
-or by downlading the `.zip` file. Then, in the source code folder after creating a virtual environment use:
+or download the source code files. Then, in the source code folder after creating a virtual environment use:
 ```bash
 pip install . 
 ```
+to install the package.
 
 ## Usage
 After installing, launch the app by typing `pyfitit-gui` in your terminal.
 
+## Documentation
+Code documentation is generated via [pdoc](https://pdoc.dev/). This repo also contains a hand-written manual describing PyFitIt, and in the future it will also contatin a chapter on PyFitIt GUI.
 
+## License
+This code is availible under the GNU GPL v3 license as stated in the LICENSE file.
