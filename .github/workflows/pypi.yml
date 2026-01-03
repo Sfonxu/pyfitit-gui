@@ -34,7 +34,6 @@ jobs:
           python -m build 2>&1 | tee build.log
           exit `fgrep -i warning build.log | grep -v "tool.setuptools_scm" | wc -l`
 
-      - name: Run twine check
       - run: twine check --strict dist/*
         
       - if: github.event_name == 'push' && github.ref == 'refs/head/main'
