@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 packages = ['pyfitit_gui']
 
 [tool.setuptools.package-data]
-"*" = ["*.template"]
+templates = ["*.template"]
 
 [project]
 name = "pyfitit_gui"
