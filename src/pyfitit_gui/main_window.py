@@ -332,7 +332,7 @@ class MainWindow(QWidget):
             if deformations:
                 output_dictionary = {
                     "molecule_file": self.widgets["molecule_file_label"].text(),
-                    "parts": self.widgets["molecule_partition"].text(),
+                    "parts": self.widgets["molecule_partition_input"].text(),
                     "deformations": deformations,
                     "project_name": project_name,
                     "project_folder": project_dir,
@@ -346,13 +346,13 @@ class MainWindow(QWidget):
                     "energy_range": self.widgets["FDMNES_energy_range_input"].text(),
                     "Green": green,
                     "Radius": self.widgets["FDMNES_radius_input"].text(),
-                    "GH": self.widgets["smooth_GH_input"].text(),
-                    "Ecent": self.widgets["smooth_Ecent_input"].text(),
-                    "Elarg": self.widgets["smooth_Elarg_input"].text(),
-                    "Gmax": self.widgets["smooth_Gmax_input"].text(),
-                    "Efermi": self.widgets["smooth_Efermi_input"].text(),
-                    "shift": self.widgets["smooth_Shift_input"].text(),
-                    "norm": self.widgets["smooth_Norm_input"].text(),
+                    "GH": self.widgets["FDMNES_gamma_hole_input"].text(),
+                    "Ecent": self.widgets["FDMNES_Ecent_input"].text(),
+                    "Elarg": self.widgets["FDMNES_Elarg_input"].text(),
+                    "Gmax": self.widgets["FDMNES_Gmax_input"].text(),
+                    "Efermi": self.widgets["FDMNES_Efermi_input"].text(),
+                    "shift": self.widgets["FDMNES_Shift_input"].text(),
+                    "norm": self.widgets["PyFitIt_norm_input"].text(),
                 }
                 invalidate = False
                 for _, value in output_dictionary.items():
