@@ -18,6 +18,7 @@ readme = "README.md"
 authors = [
     {name = "Michał Wroński", email = "mwronski@student.agh.edu.pl"}
 ]
+description = "a PyQT-based GUI for the pyfitit package"
 license = "GPL-3.0"
 license-files = ["LICENSE"]
 
