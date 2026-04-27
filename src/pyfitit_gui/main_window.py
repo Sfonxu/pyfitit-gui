@@ -331,6 +331,7 @@ class MainWindow(QWidget):
             project_name = self.widgets["project_name_input"].text()
             if deformations:
                 output_dictionary = {
+                    "geometry_param_ranges": self.expand_geometry_param_ranges(),
                     "molecule_file": self.widgets["molecule_file_label"].text(),
                     "parts": self.widgets["molecule_partition_input"].text(),
                     "deformations": deformations,
@@ -459,7 +460,7 @@ class MainWindow(QWidget):
         error_dialog.exec_()
 
     def expand_deformations(self):
-        """Fucntion that translates a list of deformations into a string
+        """Function that translates a list of deformations into a string
         representation that would be encountered in a PyFitIt project file"""
         # pylint: disable=line-too-long
         deform_string_list = []
@@ -484,6 +485,25 @@ class MainWindow(QWidget):
         if deform_string_list:
             deformation_string = "".join(deform_string_list)
             return deformation_string
+        self.save_and_exit_error_message(
+            "No deformations defined, unable to generate project!"
+        )
+        return ""
+
+    def expand_geometry_param_ranges(self):
+        """Function that translates the deformations object into
+        a list of deformation names and their respective ranges"""
+        geometry_param_ranges_list = []
+        for deformation in self.deformations:
+            geometry_param_ranges_list.append(
+                f" '{deformation.name}': [{deformation.range_left}, {deformation.range_right}],\n"
+            )
+
+        if geometry_param_ranges_list:
+            geometry_string = "".join(geometry_param_ranges_list)
+            if geometry_string[-1] == "\n":
+                geometry_string = geometry_string[:-1]
+            return geometry_string
         self.save_and_exit_error_message(
             "No deformations defined, unable to generate project!"
         )
