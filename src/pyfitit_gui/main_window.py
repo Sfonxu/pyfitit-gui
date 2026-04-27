@@ -494,20 +494,18 @@ class MainWindow(QWidget):
         geometry_param_ranges_list = []
         for deformation in self.deformations:
             geometry_param_ranges_list.append(
-                f" \'{deformation.name}\': [{deformation.range_left}, {deformation.range_right}],\n"
+                f" '{deformation.name}': [{deformation.range_left}, {deformation.range_right}],\n"
             )
 
         if geometry_param_ranges_list:
             geometry_string = "".join(geometry_param_ranges_list)
-            if geometry_string[-1] == '\n':
+            if geometry_string[-1] == "\n":
                 geometry_string = geometry_string[:-1]
             return geometry_string
         self.save_and_exit_error_message(
             "No deformations defined, unable to generate project!"
         )
         return ""
-
-            
 
     def __create_deformations_list(self, layout: QHBoxLayout):
         style = self.style()

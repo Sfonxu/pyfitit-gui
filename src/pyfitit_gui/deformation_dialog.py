@@ -1,20 +1,19 @@
 """Module holding the logic of adding deformations to the simulation input file"""
 
 from PyQt5.QtGui import (
-    QIntValidator,
     QDoubleValidator,
+    QIntValidator,
 )
-
 from PyQt5.QtWidgets import (
     QComboBox,
     QDialog,
     QDialogButtonBox,
+    QHBoxLayout,
     QLabel,
     QLineEdit,
     QListWidget,
     QMessageBox,
     QVBoxLayout,
-    QHBoxLayout,
 )
 
 from .datatypes import Deformation
@@ -42,21 +41,21 @@ class DeformationDialog(QDialog):
         self.deformation_parts = QLineEdit()
         self.deformation_parts.setValidator(QIntValidator())
         main.addWidget(self.deformation_parts)
-        
+
         main.addWidget(QLabel("Input first atom index"))
         self.deformation_first_atom = QLineEdit()
         self.deformation_first_atom.setValidator(QIntValidator())
         main.addWidget(self.deformation_first_atom)
-        
+
         main.addWidget(QLabel("Input second atom index"))
         self.deformation_second_atom = QLineEdit()
         self.deformation_second_atom.setValidator(QIntValidator())
         main.addWidget(self.deformation_second_atom)
-        
+
         main.addWidget(QLabel("Choose deformation type"))
         self.deformation_type = QComboBox()
         self.deformation_type.addItems(["rotation", "shift"])
-        
+
         self.deformation_type.isEditable = False
         main.addWidget(self.deformation_type)
         main.addWidget(QLabel("Input a unique deformation name"))
@@ -75,7 +74,7 @@ class DeformationDialog(QDialog):
         deformation_range_box.addWidget(self.deformation_range_right)
 
         main.addLayout(deformation_range_box)
-        
+
         if deformation_to_edit_idx is not None:
             temp_deformation = deformations[deformation_to_edit_idx]
             self.deformation_parts.setText(temp_deformation.part)
@@ -150,13 +149,11 @@ class DeformationDialog(QDialog):
                     self.deformation_warning_message(
                         "Warning: Deformation names must be unique!"
                     )
-                    
+
         if not invalidate:
             deformation_left = deformation_holder[5].replace(",", ".")
             deformation_right = deformation_holder[6].replace(",", ".")
-            if (
-                float(deformation_left) > float(deformation_right)
-            ):
+            if float(deformation_left) > float(deformation_right):
                 invalidate = True
                 self.deformation_warning_message(
                     "Warning: Left-hand-side value of deformation range must be smaller than the right-hand-side value!"
@@ -190,7 +187,7 @@ class DeformationDialog(QDialog):
             self.deformation_type.currentText(),
             self.deformation_name.text(),
             self.deformation_range_left.text(),
-            self.deformation_range_right.text()
+            self.deformation_range_right.text(),
         )
 
         deformation_listbox.item(deformation_to_edit_idx).setText(
@@ -213,7 +210,7 @@ class DeformationDialog(QDialog):
                 self.deformation_type.currentText(),
                 self.deformation_name.text(),
                 self.deformation_range_left.text(),
-                self.deformation_range_right.text()
+                self.deformation_range_right.text(),
             )
         )
         deformation_listbox.addItem(self.deformation_name.text())
