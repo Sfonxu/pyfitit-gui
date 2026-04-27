@@ -12,3 +12,5 @@ class Deformation:
     atom_2: int
     def_type: str
     name: str
+    range_left: float
+    range_right: float

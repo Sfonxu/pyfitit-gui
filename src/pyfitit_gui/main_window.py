@@ -331,6 +331,7 @@ class MainWindow(QWidget):
             project_name = self.widgets["project_name_input"].text()
             if deformations:
                 output_dictionary = {
+                    "geometry_param_ranges": self.expand_geometry_param_ranges(),
                     "molecule_file": self.widgets["molecule_file_label"].text(),
                     "parts": self.widgets["molecule_partition_input"].text(),
                     "deformations": deformations,
@@ -488,6 +489,25 @@ class MainWindow(QWidget):
             "No deformations defined, unable to generate project!"
         )
         return ""
+
+    def expand_geometry_param_ranges(self):
+        geometry_param_ranges_list = []
+        for deformation in self.deformations:
+            geometry_param_ranges_list.append(
+                f" \'{deformation.name}\': [{deformation.range_left}, {deformation.range_right}],\n"
+            )
+
+        if geometry_param_ranges_list:
+            geometry_string = "".join(geometry_param_ranges_list)
+            if geometry_string[-1] == '\n':
+                geometry_string = geometry_string[:-1]
+            return geometry_string
+        self.save_and_exit_error_message(
+            "No deformations defined, unable to generate project!"
+        )
+        return ""
+
+            
 
     def __create_deformations_list(self, layout: QHBoxLayout):
         style = self.style()

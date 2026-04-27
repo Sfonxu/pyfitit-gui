@@ -26,7 +26,9 @@ def projectConstructor(expFile='$spectrum_file'):
       'plot': [a, b]
     }
 
-    project.geometryParamRanges = {}
+    project.geometryParamRanges = {
+    	$geometry_param_ranges
+}
     project.FDMNES_calc = {
         'Energy range': '$energy_range',
         'Green': $Green,

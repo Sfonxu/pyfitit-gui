@@ -1,6 +1,10 @@
 """Module holding the logic of adding deformations to the simulation input file"""
 
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import (
+    QIntValidator,
+    QDoubleValidator,
+)
+
 from PyQt5.QtWidgets import (
     QComboBox,
     QDialog,
@@ -10,6 +14,7 @@ from PyQt5.QtWidgets import (
     QListWidget,
     QMessageBox,
     QVBoxLayout,
+    QHBoxLayout,
 )
 
 from .datatypes import Deformation
@@ -37,23 +42,40 @@ class DeformationDialog(QDialog):
         self.deformation_parts = QLineEdit()
         self.deformation_parts.setValidator(QIntValidator())
         main.addWidget(self.deformation_parts)
+        
         main.addWidget(QLabel("Input first atom index"))
         self.deformation_first_atom = QLineEdit()
         self.deformation_first_atom.setValidator(QIntValidator())
         main.addWidget(self.deformation_first_atom)
+        
         main.addWidget(QLabel("Input second atom index"))
         self.deformation_second_atom = QLineEdit()
         self.deformation_second_atom.setValidator(QIntValidator())
         main.addWidget(self.deformation_second_atom)
+        
         main.addWidget(QLabel("Choose deformation type"))
         self.deformation_type = QComboBox()
         self.deformation_type.addItems(["rotation", "shift"])
+        
         self.deformation_type.isEditable = False
         main.addWidget(self.deformation_type)
         main.addWidget(QLabel("Input a unique deformation name"))
         self.deformation_name = QLineEdit()
         main.addWidget(self.deformation_name)
 
+        deformation_range_box = QHBoxLayout()
+
+        deformation_range_box.addWidget(QLabel("Input deformation ranges"))
+        self.deformation_range_left = QLineEdit()
+        self.deformation_range_left.setValidator(QDoubleValidator())
+        self.deformation_range_right = QLineEdit()
+        self.deformation_range_right.setValidator(QDoubleValidator())
+
+        deformation_range_box.addWidget(self.deformation_range_left)
+        deformation_range_box.addWidget(self.deformation_range_right)
+
+        main.addLayout(deformation_range_box)
+        
         if deformation_to_edit_idx is not None:
             temp_deformation = deformations[deformation_to_edit_idx]
             self.deformation_parts.setText(temp_deformation.part)
@@ -61,6 +83,8 @@ class DeformationDialog(QDialog):
             self.deformation_second_atom.setText(temp_deformation.atom_2)
             self.deformation_name.setText(temp_deformation.name)
             self.deformation_type.setCurrentText(temp_deformation.def_type)
+            self.deformation_range_left.setText(temp_deformation.range_left)
+            self.deformation_range_right.setText(temp_deformation.range_right)
 
         button = QDialogButtonBox.Save | QDialogButtonBox.Cancel
 
@@ -97,6 +121,8 @@ class DeformationDialog(QDialog):
             self.deformation_second_atom.text(),
             self.deformation_type.currentText(),
             self.deformation_name.text(),
+            self.deformation_range_left.text(),
+            self.deformation_range_right.text(),
         ]
 
         for item in deformation_holder:
@@ -124,6 +150,17 @@ class DeformationDialog(QDialog):
                     self.deformation_warning_message(
                         "Warning: Deformation names must be unique!"
                     )
+                    
+        if not invalidate:
+            deformation_left = deformation_holder[5].replace(",", ".")
+            deformation_right = deformation_holder[6].replace(",", ".")
+            if (
+                float(deformation_left) > float(deformation_right)
+            ):
+                invalidate = True
+                self.deformation_warning_message(
+                    "Warning: Left-hand-side value of deformation range must be smaller than the right-hand-side value!"
+                )
 
         if not invalidate:
             if deformation_to_edit_idx is not None:
@@ -152,6 +189,8 @@ class DeformationDialog(QDialog):
             self.deformation_second_atom.text(),
             self.deformation_type.currentText(),
             self.deformation_name.text(),
+            self.deformation_range_left.text(),
+            self.deformation_range_right.text()
         )
 
         deformation_listbox.item(deformation_to_edit_idx).setText(
@@ -173,6 +212,8 @@ class DeformationDialog(QDialog):
                 self.deformation_second_atom.text(),
                 self.deformation_type.currentText(),
                 self.deformation_name.text(),
+                self.deformation_range_left.text(),
+                self.deformation_range_right.text()
             )
         )
         deformation_listbox.addItem(self.deformation_name.text())
