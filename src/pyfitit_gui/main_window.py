@@ -460,7 +460,7 @@ class MainWindow(QWidget):
         error_dialog.exec_()
 
     def expand_deformations(self):
-        """Fucntion that translates a list of deformations into a string
+        """Function that translates a list of deformations into a string
         representation that would be encountered in a PyFitIt project file"""
         # pylint: disable=line-too-long
         deform_string_list = []
@@ -491,6 +491,8 @@ class MainWindow(QWidget):
         return ""
 
     def expand_geometry_param_ranges(self):
+        """Function that translates the deformations object into
+        a list of deformation names and their respective ranges"""
         geometry_param_ranges_list = []
         for deformation in self.deformations:
             geometry_param_ranges_list.append(

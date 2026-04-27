@@ -156,7 +156,8 @@ class DeformationDialog(QDialog):
             if float(deformation_left) > float(deformation_right):
                 invalidate = True
                 self.deformation_warning_message(
-                    "Warning: Left-hand-side value of deformation range must be smaller than the right-hand-side value!"
+                    """Warning: Left-hand-side value of deformation range
+                    must be smaller than the right-hand-side value!"""
                 )
 
         if not invalidate:
